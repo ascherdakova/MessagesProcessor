@@ -3,4 +3,7 @@
     <string name="source_language_request">Please choose source language</string>
     <string name="target_language_request">Please choose target language</string>
     <string name="enable_service">Enable service</string>
+    <string name="ok">OK</string>
+    <string name="sms_access_required">SMS access is required to conduct message translation.</string>
+    <string name="sms_unavailable"><b>Service could not be started.</b>\nThis occurs when the sms permission is not granted.</string>
 </resources>
