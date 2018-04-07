@@ -1,18 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.edu.hse.messagesprocessor.MainActivity">
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:screenOrientation="portrait">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/source_language_request_text"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="@string/source_language_request"
+        android:textColor="@android:color/white"></TextView>
 
-</android.support.constraint.ConstraintLayout>
+    <Spinner
+        android:id="@+id/source_language_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="@android:drawable/editbox_dropdown_dark_frame"
+        android:padding="10dp"
+        android:spinnerMode="dialog" />
+
+    <TextView
+        android:id="@+id/target_language_request_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/target_language_request"
+        android:textColor="@android:color/white" />
+
+    <Spinner
+        android:id="@+id/target_language_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="@android:drawable/editbox_dropdown_dark_frame"
+        android:padding="10dp"
+        android:spinnerMode="dialog" />
+
+    <CheckBox
+        android:id="@+id/checkBoxIsEnabled"
+        android:layout_width="match_parent"
+        android:text="@string/enable_service"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
