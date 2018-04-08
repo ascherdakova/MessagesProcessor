@@ -23,6 +23,7 @@ public class ListeningService extends Service {
         filter.setPriority(100);
         smsMonitor = new SMSMonitor();
         registerReceiver(smsMonitor, filter, Manifest.permission.BROADCAST_SMS, null);
+        Toast.makeText(getBaseContext(), "SMS translator activated", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -38,6 +39,7 @@ public class ListeningService extends Service {
 
     @Override
     public void onDestroy() {
+        Toast.makeText(getBaseContext(), "SMS translator deactivated", Toast.LENGTH_SHORT).show();
         unregisterReceiver(smsMonitor);
     }
 }

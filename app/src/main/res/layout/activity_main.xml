@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/source_language_request"
-        android:textColor="@android:color/white"></TextView>
+        android:textColor="@android:color/white" />
 
     <Spinner
         android:id="@+id/source_language_spinner"
@@ -39,7 +39,8 @@
         android:layout_margin="10dp"
         android:background="@android:drawable/editbox_dropdown_dark_frame"
         android:padding="10dp"
-        android:spinnerMode="dialog" />
+        android:spinnerMode="dialog"
+        android:visibility="visible" />
 
     <CheckBox
         android:id="@+id/check_box_is_enabled"
