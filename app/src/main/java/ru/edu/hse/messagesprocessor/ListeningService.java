@@ -23,7 +23,6 @@ public class ListeningService extends Service {
         filter.setPriority(100);
         smsMonitor = new SMSMonitor();
         registerReceiver(smsMonitor, filter, Manifest.permission.BROADCAST_SMS, null);
-        Toast.makeText(getBaseContext(), "Service started", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -40,6 +39,5 @@ public class ListeningService extends Service {
     @Override
     public void onDestroy() {
         unregisterReceiver(smsMonitor);
-        Toast.makeText(getBaseContext(), "Service destroyed", Toast.LENGTH_SHORT).show();
     }
 }
