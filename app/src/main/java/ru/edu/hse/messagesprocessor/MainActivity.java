@@ -3,6 +3,7 @@ package ru.edu.hse.messagesprocessor;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -16,14 +17,16 @@ import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-//import com.google.cloud.translate.Language;
-//import com.google.cloud.translate.Translate;
-//import com.google.cloud.translate.TranslateOptions;
+import com.google.cloud.translate.Language;
+import com.google.cloud.translate.Translate;
+import com.google.cloud.translate.TranslateOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String API_KEY = "Put your key here";
 
     private static final int SMS_PERMISSION_CODE = 0;
 
@@ -38,17 +41,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mLayout = findViewById(R.id.main_layout);
 
-        //Translate translate = TranslateOptions.newBuilder().build().getService();
-        //com.google.cloud.translate.Translate.LanguageListOption target = Translate.LanguageListOption.targetLanguage("en");
-        //List<Language> languages = translate.listSupportedLanguages(target);
+        LanguageLoader ll =  new LanguageLoader();
+        ll.execute();
 
-        //for (Language language : languages) {
-            //System.out.printf("Name: %s, Code: %s\n", language.getName(), language.getCode());
-        //    sourceLanguages.add(language.getName());
-        //}
-
-        sourceLanguages.add("ru");
-        sourceLanguages.add("en");
+        //sourceLanguages.add("ru");
+        //sourceLanguages.add("en");
         targetLanguages.add("ru");
 
         // адаптер
@@ -132,6 +129,27 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.make(mLayout, R.string.sms_unavailable, Snackbar.LENGTH_LONG).show();
                 }
                 break;
+            }
+        }
+    }
+
+    class LanguageLoader extends AsyncTask<Void, Void, Void> {
+
+        List<Language> languages;
+
+        @Override
+        protected Void doInBackground(Void... urls) {
+            Translate translate = TranslateOptions.newBuilder().setApiKey(API_KEY).build().getService();
+            Translate.LanguageListOption target = Translate.LanguageListOption.targetLanguage("en");
+            languages = translate.listSupportedLanguages(target);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            for (Language language : languages) {
+             //System.out.printf("Name: %s, Code: %s\n", language.getName(), language.getCode());
+             sourceLanguages.add(language.getName());
             }
         }
     }
