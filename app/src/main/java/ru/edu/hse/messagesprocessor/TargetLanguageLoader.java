@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.translate.Language;
@@ -13,14 +12,17 @@ import com.google.cloud.translate.TranslateOptions;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
-class TargetLanguageLoader extends AsyncTask<String, Void, Void> {
+class TargetLanguageLoader extends AsyncTask<Void, Void, Void> {
 
     private WeakReference<MainActivity> activityReference;
+    private HashMap<String, String> tempLangCodes = new HashMap<>();
     private ArrayList<String> targetLanguages = new ArrayList<>();
-    private Translate translate;
     private GoogleCredentials credentials;
+    private int systemLanguagePosition;
 
     TargetLanguageLoader(MainActivity context) {
         activityReference = new WeakReference<>(context);
@@ -28,13 +30,19 @@ class TargetLanguageLoader extends AsyncTask<String, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String... urls) {
-        translate = TranslateOptions.newBuilder().setCredentials(credentials).build().getService();
-        Translate.LanguageListOption target = Translate.LanguageListOption.targetLanguage(urls[0]);
+    protected Void doInBackground(Void... urls) {
+        Translate translate = TranslateOptions.newBuilder().setCredentials(credentials).build().getService();
+        String systemLanguage = Locale.getDefault().getLanguage();
+        Translate.LanguageListOption target = Translate.LanguageListOption.targetLanguage(systemLanguage);
         List<Language> languages = translate.listSupportedLanguages(target);
-        targetLanguages.clear();
+        int positionChecker = 0;
         for (Language language : languages) {
             targetLanguages.add(language.getName());
+            tempLangCodes.put(language.getName(), language.getCode());
+            if (language.getCode().equals(systemLanguage)){
+                systemLanguagePosition = positionChecker;
+            }
+            positionChecker++;
         }
         return null;
     }
@@ -42,8 +50,10 @@ class TargetLanguageLoader extends AsyncTask<String, Void, Void> {
     @Override
     protected void onPostExecute(Void result) {
 
-        MainActivity activity = activityReference.get();
+        final MainActivity activity = activityReference.get();
         if (activity == null || activity.isFinishing()) return;
+
+        activity.langCodes.putAll(tempLangCodes);
 
         // адаптер
         ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, targetLanguages);
@@ -52,18 +62,17 @@ class TargetLanguageLoader extends AsyncTask<String, Void, Void> {
         activity.spinnerTargetLanguage = activity.findViewById(R.id.target_language_spinner);
         activity.spinnerTargetLanguage.setAdapter(adapter);
 
+        // устанавливаем обработчик нажатия
         activity.spinnerTargetLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // показываем позиция нажатого элемента
-                //Toast.makeText(getBaseContext(), "Position = " + position, Toast.LENGTH_SHORT).show();
+                SourceLanguageLoader tll =  new SourceLanguageLoader(activity);
+                tll.execute(activity.langCodes.get(activity.spinnerTargetLanguage.getSelectedItem().toString()));
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
-
-        activity.spinnerTargetLanguage.setSelection(1);
+        activity.spinnerTargetLanguage.setSelection(systemLanguagePosition);
     }
-
 }

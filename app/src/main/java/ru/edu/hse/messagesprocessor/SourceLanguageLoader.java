@@ -12,13 +12,11 @@ import com.google.cloud.translate.TranslateOptions;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-class SourceLanguageLoader extends AsyncTask<Void, Void, Void> {
+class SourceLanguageLoader extends AsyncTask<String, Void, Void> {
 
     private WeakReference<MainActivity> activityReference;
-    private HashMap<String, String> tempLangCodes = new HashMap<>();
     private ArrayList<String> sourceLanguages = new ArrayList<>();
     private GoogleCredentials credentials;
 
@@ -28,13 +26,13 @@ class SourceLanguageLoader extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... urls) {
+    protected Void doInBackground(String... urls) {
         Translate translate = TranslateOptions.newBuilder().setCredentials(credentials).build().getService();
-        Translate.LanguageListOption target = Translate.LanguageListOption.targetLanguage("en");
+        Translate.LanguageListOption target = Translate.LanguageListOption.targetLanguage(urls[0]);
         List<Language> languages = translate.listSupportedLanguages(target);
+        sourceLanguages.clear();
         for (Language language : languages) {
             sourceLanguages.add(language.getName());
-            tempLangCodes.put(language.getName(), language.getCode());
         }
         return null;
     }
@@ -42,10 +40,8 @@ class SourceLanguageLoader extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void result) {
 
-        final MainActivity activity = activityReference.get();
+        MainActivity activity = activityReference.get();
         if (activity == null || activity.isFinishing()) return;
-
-        activity.langCodes.putAll(tempLangCodes);
 
         // адаптер
         ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, sourceLanguages);
@@ -54,17 +50,18 @@ class SourceLanguageLoader extends AsyncTask<Void, Void, Void> {
         activity.spinnerSourceLanguage = activity.findViewById(R.id.source_language_spinner);
         activity.spinnerSourceLanguage.setAdapter(adapter);
 
-        // устанавливаем обработчик нажатия
         activity.spinnerSourceLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                TargetLanguageLoader tll =  new TargetLanguageLoader(activity);
-                tll.execute(activity.langCodes.get(activity.spinnerSourceLanguage.getSelectedItem().toString()));
+                // показываем позиция нажатого элемента
+                //Toast.makeText(getBaseContext(), "Position = " + position, Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
+
         activity.spinnerSourceLanguage.setSelection(1);
     }
+
 }

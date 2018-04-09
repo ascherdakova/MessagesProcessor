@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     CheckBox isEnabled;
     private View mLayout;
     GoogleCredentials credentials;
-    SourceLanguageLoader sll;
+    TargetLanguageLoader tll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +48,14 @@ public class MainActivity extends AppCompatActivity {
         isEnabled.setOnClickListener(checkBoxOnClickListener);
         //TODO: save state
 
-        sll = new SourceLanguageLoader(MainActivity.this);
-        sll.execute();
+        tll = new TargetLanguageLoader(MainActivity.this);
+        tll.execute();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sll.cancel(true);
+        tll.cancel(true);
     }
 
     private View.OnClickListener checkBoxOnClickListener = new View.OnClickListener() {
@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_SMS}, SMS_PERMISSION_CODE);
                     }
                 } else {
-                    //TODO separate thread
                     startService(new Intent(MainActivity.this, ListeningService.class));
                 }
             } else {
@@ -88,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case SMS_PERMISSION_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //TODO separate thread
                     startService(new Intent(MainActivity.this, ListeningService.class));
                 } else {
                     isEnabled.setChecked(false);
