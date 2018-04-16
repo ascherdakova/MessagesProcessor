@@ -1,5 +1,7 @@
 package ru.edu.hse.messagesprocessor;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AdapterView;
@@ -53,7 +55,7 @@ class TargetLanguageLoader extends AsyncTask<Void, Void, Void> {
         final MainActivity activity = activityReference.get();
         if (activity == null || activity.isFinishing()) return;
 
-        activity.langCodes.putAll(tempLangCodes);
+        activity.targetLanguagesCodes.putAll(tempLangCodes);
 
         // адаптер
         ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, targetLanguages);
@@ -67,7 +69,14 @@ class TargetLanguageLoader extends AsyncTask<Void, Void, Void> {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 SourceLanguageLoader tll =  new SourceLanguageLoader(activity);
-                tll.execute(activity.langCodes.get(activity.spinnerTargetLanguage.getSelectedItem().toString()));
+                String langName = activity.spinnerTargetLanguage.getSelectedItem().toString();
+                //Let's store languages settings in shared preferences
+                SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                String langCode = activity.targetLanguagesCodes.get(langName);
+                editor.putString(activity.getString(R.string.saved_target_language_code), langCode);
+                editor.apply();
+                tll.execute(langCode);
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {

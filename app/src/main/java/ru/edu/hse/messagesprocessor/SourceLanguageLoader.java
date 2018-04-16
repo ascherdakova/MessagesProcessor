@@ -1,5 +1,7 @@
 package ru.edu.hse.messagesprocessor;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,11 +14,13 @@ import com.google.cloud.translate.TranslateOptions;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 class SourceLanguageLoader extends AsyncTask<String, Void, Void> {
 
     private WeakReference<MainActivity> activityReference;
+    private HashMap<String, String> tempLangCodes = new HashMap<>();
     private ArrayList<String> sourceLanguages = new ArrayList<>();
     private GoogleCredentials credentials;
 
@@ -33,6 +37,7 @@ class SourceLanguageLoader extends AsyncTask<String, Void, Void> {
         sourceLanguages.clear();
         for (Language language : languages) {
             sourceLanguages.add(language.getName());
+            tempLangCodes.put(language.getName(), language.getCode());
         }
         return null;
     }
@@ -40,8 +45,10 @@ class SourceLanguageLoader extends AsyncTask<String, Void, Void> {
     @Override
     protected void onPostExecute(Void result) {
 
-        MainActivity activity = activityReference.get();
+        final MainActivity activity = activityReference.get();
         if (activity == null || activity.isFinishing()) return;
+
+        activity.sourceLanguagesCodes.putAll(tempLangCodes);
 
         // адаптер
         ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, sourceLanguages);
@@ -53,8 +60,12 @@ class SourceLanguageLoader extends AsyncTask<String, Void, Void> {
         activity.spinnerSourceLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // показываем позиция нажатого элемента
-                //Toast.makeText(getBaseContext(), "Position = " + position, Toast.LENGTH_SHORT).show();
+                String langName = activity.spinnerSourceLanguage.getSelectedItem().toString();
+                SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                String langCode = activity.sourceLanguagesCodes.get(langName);
+                editor.putString(activity.getString(R.string.saved_source_language_code), langCode);
+                editor.apply();
             }
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
