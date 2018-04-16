@@ -1,7 +1,8 @@
 package ru.edu.hse.messagesprocessor;
 
 import android.Manifest;
-import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -24,7 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     Spinner spinnerSourceLanguage;
     Spinner spinnerTargetLanguage;
-    HashMap <String, String> langCodes = new HashMap<>();
+    HashMap <String, String> targetLanguagesCodes = new HashMap<>();
+    HashMap <String, String> sourceLanguagesCodes = new HashMap<>();
     CheckBox isEnabled;
     private View mLayout;
     GoogleCredentials credentials;
@@ -62,22 +64,24 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             if (isEnabled.isChecked()) {
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_SMS)) {
+                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.RECEIVE_SMS)) {
                         Snackbar.make(mLayout, R.string.sms_access_required, Snackbar.LENGTH_INDEFINITE).setAction(R.string.ok, new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_SMS}, SMS_PERMISSION_CODE);
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECEIVE_SMS}, SMS_PERMISSION_CODE);
                             }
                         }).show();
                     } else {
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_SMS}, SMS_PERMISSION_CODE);
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECEIVE_SMS}, SMS_PERMISSION_CODE);
                     }
                 } else {
-                    startService(new Intent(MainActivity.this, ListeningService.class));
+                    enableTranslation();
+                    //startService(new Intent(MainActivity.this, ListeningService.class));
                 }
             } else {
-                stopService(new Intent(MainActivity.this, ListeningService.class));
+                disableTranslation();
+                //stopService(new Intent(MainActivity.this, ListeningService.class));
             }
         }
     };
@@ -87,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case SMS_PERMISSION_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startService(new Intent(MainActivity.this, ListeningService.class));
+                    enableTranslation();
                 } else {
                     isEnabled.setChecked(false);
                     Snackbar.make(mLayout, R.string.sms_unavailable, Snackbar.LENGTH_LONG).show();
@@ -95,6 +99,20 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    public void enableTranslation() {
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(getString(R.string.saved_is_user_enable_service), true);
+        editor.apply();
+    }
+
+    public void disableTranslation() {
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(getString(R.string.saved_is_user_enable_service), false);
+        editor.apply();
     }
 
 }
