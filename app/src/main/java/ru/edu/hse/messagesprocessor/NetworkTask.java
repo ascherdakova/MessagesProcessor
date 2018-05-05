@@ -42,7 +42,6 @@ public class NetworkTask extends AsyncTask<Void, Void, Void> {
 
         final SMSTranslator service = serviceReference.get();
         if (service == null) return;
-
         Toast.makeText(service.getBaseContext(), translation.getTranslatedText(), Toast.LENGTH_SHORT).show();
     }
 }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import com.google.auth.oauth2.GoogleCredentials;
 
@@ -50,5 +49,9 @@ public class SMSTranslator extends Service {
 
     @Override
     public void onDestroy() {
+        SharedPreferences sharedPref = this.getApplication().getSharedPreferences(this.getApplication().getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(getString(R.string.saved_is_user_enable_service), false);
+        editor.apply();
     }
 }

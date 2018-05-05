@@ -47,8 +47,12 @@ public class MainActivity extends AppCompatActivity {
 
         //checkbox to check is user want to see service enabled or not
         isEnabled = findViewById(R.id.check_box_is_enabled);
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
+        Boolean isEnabledSaved = sharedPref.getBoolean(this.getApplication().getString(R.string.saved_is_user_enable_service), false);
+        if (isEnabledSaved){
+            isEnabled.setChecked(true);
+        }
         isEnabled.setOnClickListener(checkBoxOnClickListener);
-        //TODO: save state
 
         tll = new LanguageLoader(MainActivity.this, true);
         tll.execute();
@@ -77,11 +81,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     enableTranslation();
-                    //startService(new Intent(MainActivity.this, ListeningService.class));
                 }
             } else {
                 disableTranslation();
-                //stopService(new Intent(MainActivity.this, ListeningService.class));
             }
         }
     };
