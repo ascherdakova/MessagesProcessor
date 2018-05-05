@@ -21,10 +21,9 @@ import java.util.Locale;
 class LanguageLoader extends AsyncTask<String, Void, Void> {
 
     private WeakReference<MainActivity> activityReference;
-    private HashMap<String, String> tempLangCodes = new HashMap<>();
+    private HashMap<String, String> fullLanguageNamesToCodes = new HashMap<>();
     private ArrayList<String> languages = new ArrayList<>();
     private GoogleCredentials credentials;
-    private int systemLanguagePosition;
     private boolean isTarget;
 
     LanguageLoader(MainActivity context, boolean isTarget) {
@@ -44,14 +43,9 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
             language = Translate.LanguageListOption.targetLanguage(urls[0]);
         }
         List<Language> languages = translate.listSupportedLanguages(language);
-        int positionChecker = 0;
         for (Language languageIterator : languages) {
             this.languages.add(languageIterator.getName());
-            tempLangCodes.put(languageIterator.getName(), languageIterator.getCode());
-            if (isTarget && languageIterator.getCode().equals(systemLanguage)){
-                systemLanguagePosition = positionChecker;
-            }
-            positionChecker++;
+            fullLanguageNamesToCodes.put(languageIterator.getName(), languageIterator.getCode());
         }
         return null;
     }
@@ -65,8 +59,10 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, languages);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
+
         if (isTarget) {
-            activity.targetLanguagesCodes.putAll(tempLangCodes);
+            activity.targetLanguagesCodes.putAll(fullLanguageNamesToCodes);
             activity.spinnerTargetLanguage = activity.findViewById(R.id.target_language_spinner);
             activity.spinnerTargetLanguage.setAdapter(adapter);
 
@@ -80,6 +76,7 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
                     SharedPreferences.Editor editor = sharedPref.edit();
                     String langCode = activity.targetLanguagesCodes.get(langName);
                     editor.putString(activity.getString(R.string.saved_target_language_code), langCode);
+                    editor.putString(activity.getString(R.string.saved_target_language_name), langName);
                     editor.apply();
                     sll.execute(langCode);
                 }
@@ -88,9 +85,10 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
                 public void onNothingSelected(AdapterView<?> arg0) {
                 }
             });
-            activity.spinnerTargetLanguage.setSelection(systemLanguagePosition);
+            String locale = sharedPref.getString(activity.getString(R.string.saved_target_language_name), Locale.getDefault().getDisplayLanguage());
+            activity.spinnerTargetLanguage.setSelection(adapter.getPosition(locale));
         } else {
-            activity.sourceLanguagesCodes.putAll(tempLangCodes);
+            activity.sourceLanguagesCodes.putAll(fullLanguageNamesToCodes);
             activity.spinnerSourceLanguage = activity.findViewById(R.id.source_language_spinner);
             activity.spinnerSourceLanguage.setAdapter(adapter);
 
@@ -102,6 +100,7 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
                     SharedPreferences.Editor editor = sharedPref.edit();
                     String langCode = activity.sourceLanguagesCodes.get(langName);
                     editor.putString(activity.getString(R.string.saved_source_language_code), langCode);
+                    editor.putString(activity.getString(R.string.saved_source_language_name), langName);
                     editor.apply();
                 }
                 @Override
@@ -109,7 +108,10 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
                 }
             });
 
-            activity.spinnerSourceLanguage.setSelection(1);
+            if (sharedPref.contains(activity.getString(R.string.saved_source_language_code))) {
+                String locale = sharedPref.getString(activity.getString(R.string.saved_source_language_name), Locale.getDefault().getDisplayLanguage());
+                activity.spinnerSourceLanguage.setSelection(adapter.getPosition(locale));
+            }
         }
     }
 }
