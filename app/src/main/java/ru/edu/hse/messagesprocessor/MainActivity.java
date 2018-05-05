@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     CheckBox isEnabled;
     private View mLayout;
     GoogleCredentials credentials;
-    TargetLanguageLoader tll;
+    LanguageLoader tll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         isEnabled.setOnClickListener(checkBoxOnClickListener);
         //TODO: save state
 
-        tll = new TargetLanguageLoader(MainActivity.this);
+        tll = new LanguageLoader(MainActivity.this, true);
         tll.execute();
     }
 
