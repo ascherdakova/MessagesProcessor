@@ -11,10 +11,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.auth.oauth2.GoogleCredentials;
 
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     HashMap <String, String> sourceLanguagesCodes = new HashMap<>();
     CheckBox isEnabled;
     ProgressBar progressBar;
+    TextView progressText;
+    boolean isLoading;
     private View mLayout;
     GoogleCredentials credentials;
     LanguageLoader tll;
@@ -50,8 +53,10 @@ public class MainActivity extends AppCompatActivity {
 
         //show progress bar & turn off user interaction
         progressBar = findViewById(R.id.progress_bar);
+        progressText = findViewById(R.id.loading_text);
         progressBar.setVisibility(View.VISIBLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        progressText.setVisibility(View.VISIBLE);
+        isLoading = true;
         //checkbox to check is user want to see service enabled or not
         isEnabled = findViewById(R.id.check_box_is_enabled);
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
@@ -87,7 +92,12 @@ public class MainActivity extends AppCompatActivity {
                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECEIVE_SMS}, SMS_PERMISSION_CODE);
                     }
                 } else {
-                    enableTranslation();
+                    if (!isLoading) {
+                        enableTranslation();
+                    } else {
+                        isEnabled.setChecked(false);
+                        Toast.makeText(getApplicationContext(),getString(R.string.perform_loading_message), Toast.LENGTH_LONG).show();
+                    }
                 }
             } else {
                 disableTranslation();
@@ -123,5 +133,4 @@ public class MainActivity extends AppCompatActivity {
         editor.putBoolean(getString(R.string.saved_is_user_enable_service), false);
         editor.apply();
     }
-
 }
