@@ -24,6 +24,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".TranslationDialog">
+            android:theme="@style/Theme.AppCompat.Translucent"
+            android:parentActivityName=".MainActivity"
+            <!-- The meta-data tag is required to support API level 15 and lower -->
+            <!-- We can get rid of it actually-->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <receiver android:name=".SMSMonitor"
             android:permission="android.permission.BROADCAST_SMS">
             <intent-filter android:priority="999">
