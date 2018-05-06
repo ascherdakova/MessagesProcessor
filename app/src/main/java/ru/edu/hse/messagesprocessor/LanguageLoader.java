@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
@@ -80,7 +79,8 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
                     editor.putString(activity.getString(R.string.saved_target_language_name), langName);
                     editor.apply();
                     activity.progressBar.setVisibility(View.VISIBLE);
-                    activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    activity.progressText.setVisibility(View.VISIBLE);
+                    activity.isLoading = true;
                     sll.execute(langCode);
                 }
                 @Override
@@ -116,7 +116,8 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
             }
 
             activity.progressBar.setVisibility(View.GONE);
-            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            activity.progressText.setVisibility(View.GONE);
+            activity.isLoading = false;
         }
     }
 }

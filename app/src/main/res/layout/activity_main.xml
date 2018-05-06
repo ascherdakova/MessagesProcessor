@@ -9,6 +9,13 @@
     android:paddingRight="16dp"
     android:screenOrientation="portrait">
 
+    <TextView
+        android:id="@+id/loading_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/loading_message"
+        android:textAlignment="center" />
+
     <ProgressBar
         android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyleHorizontal"

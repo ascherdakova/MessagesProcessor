@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Messages Translator</string>
-    <string name="source_language_request">Choose source language</string>
-    <string name="target_language_request">Choose target language</string>
+    <string name="source_language_request">Source language:</string>
+    <string name="target_language_request">Target language:</string>
     <string name="enable_service">Enable service</string>
     <string name="ok">OK</string>
     <string name="exit">Exit</string>
@@ -9,6 +9,8 @@
     <string name="sms_access_required">SMS access is required to conduct message translation.</string>
     <string name="sms_unavailable"><b>Service could not be started.</b>\nThis occurs when the sms permission is not granted.</string>
     <string name="voice_request">Do you want to voice the message?</string>
+    <string name="loading_message">Loading languages settings…</string>
+    <string name="perform_loading_message">Please wait until loading finished</string>
     <string name="custom_shared_preferences">CSP</string>
     <string name="saved_target_language_code">STLC</string>
     <string name="saved_source_language_code">SSLC</string>
