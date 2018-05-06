@@ -12,7 +12,6 @@ import com.google.auth.oauth2.GoogleCredentials;
 import java.io.IOException;
 
 public class SMSTranslator extends Service {
-
     public SMSTranslator() {
     }
 
@@ -32,12 +31,14 @@ public class SMSTranslator extends Service {
         if (!isEnabled || targetLanguageCode.equals(defaultString) || sourceLanguageCode.equals(defaultString) || sourceText.isEmpty()){
             return START_STICKY;
         }
+
         try {
-            NetworkTask nt =  new NetworkTask(this, sourceLanguageCode, targetLanguageCode, sourceText, GoogleCredentials.fromStream(this.getApplication().getResources().openRawResource(R.raw.credentials)));
-            nt.execute();
+            NetworkTask networkTask =  new NetworkTask(this, sourceLanguageCode, targetLanguageCode, sourceText, GoogleCredentials.fromStream(this.getApplication().getResources().openRawResource(R.raw.credentials)));
+            networkTask.execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return START_STICKY;
     }
 
