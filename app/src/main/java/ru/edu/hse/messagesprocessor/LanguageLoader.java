@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
@@ -78,9 +79,10 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
                     editor.putString(activity.getString(R.string.saved_target_language_code), langCode);
                     editor.putString(activity.getString(R.string.saved_target_language_name), langName);
                     editor.apply();
+                    activity.progressBar.setVisibility(View.VISIBLE);
+                    activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     sll.execute(langCode);
                 }
-
                 @Override
                 public void onNothingSelected(AdapterView<?> arg0) {
                 }
@@ -108,10 +110,13 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
                 }
             });
 
-            if (sharedPref.contains(activity.getString(R.string.saved_source_language_code))) {
+            if (sharedPref.contains(activity.getString(R.string.saved_source_language_name))) {
                 String locale = sharedPref.getString(activity.getString(R.string.saved_source_language_name), Locale.getDefault().getDisplayLanguage());
                 activity.spinnerSourceLanguage.setSelection(adapter.getPosition(locale));
             }
+
+            activity.progressBar.setVisibility(View.GONE);
+            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         }
     }
 }

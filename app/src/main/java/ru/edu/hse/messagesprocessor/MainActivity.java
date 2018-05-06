@@ -11,7 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CheckBox;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     HashMap <String, String> targetLanguagesCodes = new HashMap<>();
     HashMap <String, String> sourceLanguagesCodes = new HashMap<>();
     CheckBox isEnabled;
+    ProgressBar progressBar;
     private View mLayout;
     GoogleCredentials credentials;
     LanguageLoader tll;
@@ -45,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        //show progress bar & turn off user interaction
+        progressBar = findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         //checkbox to check is user want to see service enabled or not
         isEnabled = findViewById(R.id.check_box_is_enabled);
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
