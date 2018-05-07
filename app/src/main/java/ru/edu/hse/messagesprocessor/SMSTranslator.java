@@ -22,6 +22,9 @@ public class SMSTranslator extends Service {
 
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
+        if (intent == null){
+            return START_STICKY;
+        }
         SharedPreferences sharedPref = this.getApplication().getSharedPreferences(this.getApplication().getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
         Boolean isEnabled = sharedPref.getBoolean(this.getApplication().getString(R.string.saved_is_user_enable_service), false);
         String defaultString = "default";
@@ -38,7 +41,6 @@ public class SMSTranslator extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return START_STICKY;
     }
 
