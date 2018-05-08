@@ -49,14 +49,9 @@ public class SMSTranslator extends Service {
             dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(dialogIntent);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            Toast.makeText(this, this.getApplication().getString(R.string.network_issue_message_service), Toast.LENGTH_LONG).show();
         }
-
         return START_STICKY;
     }
 

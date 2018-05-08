@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.translate.Language;
@@ -25,6 +26,7 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
     private ArrayList<String> languages = new ArrayList<>();
     private GoogleCredentials credentials;
     private boolean isTarget;
+    private boolean isIssue;
 
     LanguageLoader(MainActivity context, boolean isTarget) {
         activityReference = new WeakReference<>(context);
@@ -34,6 +36,7 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
 
     @Override
     protected Void doInBackground(String... urls) {
+        isIssue = false;
         Translate translate = TranslateOptions.newBuilder().setCredentials(credentials).build().getService();
         String systemLanguage = Locale.getDefault().getLanguage();
         Translate.LanguageListOption language;
@@ -42,10 +45,14 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
         } else {
             language = Translate.LanguageListOption.targetLanguage(urls[0]);
         }
-        List<Language> languages = translate.listSupportedLanguages(language);
-        for (Language languageIterator : languages) {
-            this.languages.add(languageIterator.getName());
-            fullLanguageNamesToCodes.put(languageIterator.getName(), languageIterator.getCode());
+        try {
+            List<Language> languages = translate.listSupportedLanguages(language);
+            for (Language languageIterator : languages) {
+                this.languages.add(languageIterator.getName());
+                fullLanguageNamesToCodes.put(languageIterator.getName(), languageIterator.getCode());
+            }
+        } catch (Exception e) {
+            isIssue = true;
         }
         return null;
     }
@@ -55,6 +62,13 @@ class LanguageLoader extends AsyncTask<String, Void, Void> {
 
         final MainActivity activity = activityReference.get();
         if (activity == null || activity.isFinishing()) return;
+
+        if (isIssue) {
+            Toast.makeText(activity, activity.getString(R.string.network_issue_message), Toast.LENGTH_LONG).show();
+            activity.progressBar.setVisibility(View.GONE);
+            activity.progressText.setVisibility(View.GONE);
+            return;
+        }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, languages);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
