@@ -5,6 +5,8 @@
     <string name="enable_service">Enable service</string>
     <string name="ok">OK</string>
     <string name="exit">Exit</string>
+    <string name="notification_title">New incoming message may be translated</string>
+    <string name="notification_text">Click to open translation</string>
     <string name="message_string">Message</string>
     <string name="sms_access_required">SMS access is required to conduct message translation.</string>
     <string name="sms_unavailable"><b>Service could not be started.</b>\nThis occurs when the sms permission is not granted.</string>
