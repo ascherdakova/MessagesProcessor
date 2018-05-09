@@ -11,20 +11,24 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
-public class TranslationDialog extends Activity
-{
+public class TranslationDialog extends Activity {
+
     public static final String TRANSLATION_KEY = "translation_key";
     public static final String KEY_IS_VOICE_ENABLED = "is_voice_enabled";
-    //static final String ACTION = "android.provider.Telephony.SMS_RECEIVED";
+
     String translated;
-    TextToSpeech textToSpeech;
-    String targetLanguageCode;
 
     boolean bound = false;
-    ServiceConnection serviceConnection;
-    Intent intent;
+    private ServiceConnection serviceConnection;
+    private Intent intent;
+
+    private Thread thread;
+    private boolean isRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,25 @@ public class TranslationDialog extends Activity
                 bound = false;
             }
         };
+
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                checkTTSVoiceData();
+
+                String customSharedPrefs = getResources().getString(R.string.custom_shared_preferences);
+                SharedPreferences sharedPref = getSharedPreferences(customSharedPrefs, Context.MODE_PRIVATE);
+                Boolean isVoiceEnabled = sharedPref.getBoolean(TranslationDialog.KEY_IS_VOICE_ENABLED, false);
+
+                if(isVoiceEnabled) {
+                    intent = new Intent(TranslationDialog.this, Speaker.class);
+                    intent.putExtra(Speaker.TEXT_KEY, translated);
+                    bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+                    unbindService(serviceConnection);
+                }
+                isRunning = false;
+            }
+        });
     }
 
     private void displayResult(){
@@ -59,31 +82,41 @@ public class TranslationDialog extends Activity
 
         builder.setMessage(message)
                 .setCancelable(false)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Intent checkIntent = new Intent();
-                        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-                        startActivityForResult(checkIntent, Speaker.CHECK_TTS_DATA);
-
-                        checkTTSVoiceData();
-
-                        intent = new Intent(TranslationDialog.this, Speaker.class);
-                        intent.putExtra(Speaker.TEXT_KEY, translated);
-                        bindService(intent, serviceConnection, BIND_AUTO_CREATE);
-                        unbindService(serviceConnection);
-
-                        //TODO: prevent alert from closing in this case
-                        //dialog.dismiss();
-                        //finish();
-                    }
-                }).setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.ok, null)
+                .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
                         finish();
                         //TODO: close the app
                     }
                 });
-        AlertDialog alert = builder.create();
+        final AlertDialog alert = builder.create();
+
+        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        Log.i(this.getClass().getSimpleName(), "Positive button clicked");
+
+                        if(!isRunning)
+                        {
+                            isRunning = true;
+                            thread.start();
+                        }
+
+                        // remove next two lines if you need the dialog to stay.
+                        // Note: it won't be speaking more than once, idk why yet
+                        alert.dismiss();
+                        finish();
+                    }
+                });
+            }
+        });
         alert.show();
     }
 

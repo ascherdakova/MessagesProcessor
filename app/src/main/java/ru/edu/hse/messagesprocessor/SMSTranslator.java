@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.translate.Translation;

@@ -39,8 +39,8 @@ public class Speaker extends Service implements TextToSpeech.OnInitListener {
                 SharedPreferences sharedPref = this.getApplication().getSharedPreferences(custom_shared_prefs, Context.MODE_PRIVATE);
                 String targetLanguageCode = sharedPref.getString(target_language_code, SMSTranslator.defaultString);
 
-                String tts_error = this.getApplication().getString(R.string.tts_isnt_supported_error);
-                String tts_ready = this.getApplication().getString(R.string.tts_ready);
+                //String tts_error = this.getApplication().getString(R.string.tts_isnt_supported_error);
+                //String tts_ready = this.getApplication().getString(R.string.tts_ready);
 
                 int result = mTTS.setLanguage(new Locale(targetLanguageCode));
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
@@ -63,7 +63,7 @@ public class Speaker extends Service implements TextToSpeech.OnInitListener {
 
     public int speak(String text, boolean qmode) {
         final String tag = this.getClass().getSimpleName();
-        Log.e(tag, "Text to speak:\n" + text);
+        Log.i(tag, "Text to speak:\n" + text);
 
         if (mTTS == null){
             Log.e(tag, "TTS is null. Exiting.");
@@ -83,7 +83,7 @@ public class Speaker extends Service implements TextToSpeech.OnInitListener {
         else
             mTTS.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
 
-        Log.e(tag, "Success");
+        Log.i(tag, "Success");
         return OK;
     }
 
@@ -114,6 +114,7 @@ public class Speaker extends Service implements TextToSpeech.OnInitListener {
         String text = intent.getExtras().getString(TEXT_KEY);
         Boolean qmode = intent.getExtras().getBoolean(Q_KEY);
 
+        Log.i(this.getClass().getSimpleName(), "onBind() " + text);
         speak(text, null == qmode ? true : qmode);
 
         return null;
