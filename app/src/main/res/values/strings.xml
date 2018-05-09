@@ -13,6 +13,10 @@
     <string name="perform_loading_message">Please wait until loading finished</string>
     <string name="network_issue_message">Network issues. Try to restart the app!</string>
     <string name="network_issue_message_service">Ooops! Smf went wrong and we can\'t translate SMS</string>
+    <string name="cannot_voice_error">ERROR: cannot voice the message</string>
+    <string name="tts_isnt_supported_error">TTS language is not supported</string>
+    <string name="tts_ready">TTS is ready!</string>
+    <string name="tts_init_failed_error">TTS initialization failed</string>
     <string name="custom_shared_preferences">CSP</string>
     <string name="saved_target_language_code">STLC</string>
     <string name="saved_source_language_code">SSLC</string>

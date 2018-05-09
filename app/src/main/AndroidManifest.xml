@@ -36,6 +36,7 @@
             </intent-filter>
         </receiver>
         <service android:name=".SMSTranslator" />
+        <service android:name=".Speaker"/>
     </application>
 
 </manifest>

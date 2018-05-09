@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.translate.Translation;
@@ -45,7 +44,7 @@ public class SMSTranslator extends Service {
             Translation result = networkTask.execute().get();
 
             //TODO: start the activity through push notification
-            Intent dialogIntent = new Intent(this, TranslationDialog.class).putExtra(TranslationDialog.KEY, result.getTranslatedText());
+            Intent dialogIntent = new Intent(this, TranslationDialog.class).putExtra(TranslationDialog.TRANSLATION_KEY, result.getTranslatedText());
             dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(dialogIntent);
 
