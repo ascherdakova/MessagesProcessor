@@ -39,12 +39,12 @@ public class Speaker extends Service implements TextToSpeech.OnInitListener {
                 SharedPreferences sharedPref = this.getApplication().getSharedPreferences(custom_shared_prefs, Context.MODE_PRIVATE);
                 String targetLanguageCode = sharedPref.getString(target_language_code, SMSTranslator.defaultString);
 
-                //String tts_error = this.getApplication().getString(R.string.tts_isnt_supported_error);
+                String tts_error = this.getApplication().getString(R.string.tts_isnt_supported_error);
                 //String tts_ready = this.getApplication().getString(R.string.tts_ready);
 
                 int result = mTTS.setLanguage(new Locale(targetLanguageCode));
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    //Toast.makeText(this, tts_error, Toast.LENGTH_LONG).show(); //Useful for testing
+                    Toast.makeText(this, tts_error, Toast.LENGTH_LONG).show();
                     Log.e("TTS", "Initialization Failed!");
                 } else {
                     //Toast.makeText(this, "I can speak!", Toast.LENGTH_LONG).show(); //Useful for testing
