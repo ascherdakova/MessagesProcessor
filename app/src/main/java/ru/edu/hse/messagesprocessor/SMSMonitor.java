@@ -11,6 +11,8 @@ import android.graphics.Color;
 import android.provider.Telephony;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsMessage;
+import android.util.Log;
+
 import java.util.Objects;
 
 public class SMSMonitor extends BroadcastReceiver {
@@ -22,6 +24,19 @@ public class SMSMonitor extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Objects.equals(intent.getAction(), Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
+
+            String defaultString = SMSTranslator.defaultString;
+            SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
+            Boolean isEnabled = sharedPref.getBoolean(context.getString(R.string.saved_is_user_enable_service), false);
+
+            String targetLanguageCode = sharedPref.getString(context.getString(R.string.saved_target_language_code), defaultString);
+            String sourceLanguageCode = sharedPref.getString(context.getString(R.string.saved_source_language_code), defaultString);
+            String sourceText = sharedPref.getString(SMSMonitor.KEY_SMS_BODY, "");
+
+            if (!isEnabled || targetLanguageCode.equals(defaultString) || sourceLanguageCode.equals(defaultString) || sourceText.isEmpty()){
+                Log.e(this.getClass().getSimpleName(), "Something wrong with the input. Exiting.");
+                return;
+            }
 
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
@@ -37,7 +52,6 @@ public class SMSMonitor extends BroadcastReceiver {
             for (SmsMessage smsMessage : Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
                 smsBody.append(smsMessage.getMessageBody());
             }
-            SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(KEY_SMS_BODY, smsBody.toString());
             editor.apply();
