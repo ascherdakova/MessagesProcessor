@@ -27,9 +27,6 @@ public class TranslationDialog extends Activity {
     private ServiceConnection serviceConnection;
     private Intent intent;
 
-    private Thread thread;
-    private boolean isRunning = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,25 +49,6 @@ public class TranslationDialog extends Activity {
                 bound = false;
             }
         };
-
-        thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                checkTTSVoiceData();
-
-                String customSharedPrefs = getResources().getString(R.string.custom_shared_preferences);
-                SharedPreferences sharedPref = getSharedPreferences(customSharedPrefs, Context.MODE_PRIVATE);
-                Boolean isVoiceEnabled = sharedPref.getBoolean(TranslationDialog.KEY_IS_VOICE_ENABLED, false);
-
-                if(isVoiceEnabled) {
-                    intent = new Intent(TranslationDialog.this, Speaker.class);
-                    intent.putExtra(Speaker.TEXT_KEY, translated);
-                    bindService(intent, serviceConnection, BIND_AUTO_CREATE);
-                    unbindService(serviceConnection);
-                }
-                isRunning = false;
-            }
-        });
     }
 
     private void displayResult(){
@@ -96,23 +74,32 @@ public class TranslationDialog extends Activity {
             @Override
             public void onShow(DialogInterface dialogInterface) {
 
-                Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);
+                final Button button = alert.getButton(AlertDialog.BUTTON_POSITIVE);;
                 button.setOnClickListener(new View.OnClickListener() {
-
                     @Override
                     public void onClick(View view) {
                         Log.i(this.getClass().getSimpleName(), "Positive button clicked");
 
-                        if(!isRunning)
-                        {
-                            isRunning = true;
-                            thread.start();
+                        checkTTSVoiceData();
+
+                        String customSharedPrefs = getResources().getString(R.string.custom_shared_preferences);
+                        SharedPreferences sharedPref = getSharedPreferences(customSharedPrefs, Context.MODE_PRIVATE);
+                        Boolean isVoiceEnabled = sharedPref.getBoolean(TranslationDialog.KEY_IS_VOICE_ENABLED, false);
+
+                        Log.i(this.getClass().getSimpleName(), "isVoiceEnabled " + isVoiceEnabled);
+                        if(isVoiceEnabled) {
+                            Log.i(this.getClass().getSimpleName(), "Enabled. Binding service.");
+                            intent = new Intent(TranslationDialog.this, Speaker.class);
+                            intent.putExtra(Speaker.TEXT_KEY, translated);
+                            bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+                            unbindService(serviceConnection);
                         }
+
 
                         // remove next two lines if you need the dialog to stay.
                         // Note: it won't be speaking more than once, idk why yet
-                        alert.dismiss();
-                        finish();
+                        //alert.dismiss();
+                        //finish();
                     }
                 });
             }
