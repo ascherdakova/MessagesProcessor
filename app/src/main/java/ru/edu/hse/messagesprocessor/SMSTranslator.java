@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -35,8 +36,10 @@ public class SMSTranslator extends Service {
 
         String targetLanguageCode = sharedPref.getString(this.getApplication().getString(R.string.saved_target_language_code), defaultString);
         String sourceLanguageCode = sharedPref.getString(this.getApplication().getString(R.string.saved_source_language_code), defaultString);
-        String sourceText = intent.getStringExtra("sms_body");
-        if (!isEnabled || targetLanguageCode.equals(defaultString) || sourceLanguageCode.equals(defaultString) || sourceText.isEmpty()){
+        String sourceText = sharedPref.getString(SMSMonitor.KEY_SMS_BODY, "");
+
+        if (!isEnabled || targetLanguageCode.equals(defaultString) || sourceLanguageCode.equals(defaultString) || sourceText == null || sourceText.isEmpty()){
+            Log.e(this.getClass().getSimpleName(), "Something wrong with the input. Exiting.");
             return START_STICKY;
         }
 
@@ -45,7 +48,7 @@ public class SMSTranslator extends Service {
             Translation result = networkTask.execute().get();
 
             //TODO: start the activity through push notification
-            Intent dialogIntent = new Intent(this, TranslationDialog.class).putExtra(TranslationDialog.KEY, result.getTranslatedText());
+            Intent dialogIntent = new Intent(this, TranslationDialog.class).putExtra(TranslationDialog.TRANSLATION_KEY, result.getTranslatedText());
             dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(dialogIntent);
 

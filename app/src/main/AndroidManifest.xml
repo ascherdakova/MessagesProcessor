@@ -28,6 +28,10 @@
         </activity>
         <activity android:name=".TranslationDialog">
             android:theme="@style/Theme.AppCompat.Translucent"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
         </activity>
         <receiver android:name=".SMSMonitor"
             android:permission="android.permission.BROADCAST_SMS">
@@ -36,6 +40,7 @@
             </intent-filter>
         </receiver>
         <service android:name=".SMSTranslator" />
+        <service android:name=".Speaker"/>
     </application>
 
 </manifest>
