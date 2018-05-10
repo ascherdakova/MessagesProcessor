@@ -38,7 +38,7 @@ public class SMSTranslator extends Service {
         String sourceLanguageCode = sharedPref.getString(this.getApplication().getString(R.string.saved_source_language_code), defaultString);
         String sourceText = sharedPref.getString(SMSMonitor.KEY_SMS_BODY, "");
 
-        if (!isEnabled || targetLanguageCode.equals(defaultString) || sourceLanguageCode.equals(defaultString) || sourceText == null || sourceText.isEmpty()){
+        if (!isEnabled || targetLanguageCode.equals(defaultString) || sourceLanguageCode.equals(defaultString) || sourceText.isEmpty()){
             Log.e(this.getClass().getSimpleName(), "Something wrong with the input. Exiting.");
             return START_STICKY;
         }
@@ -47,7 +47,6 @@ public class SMSTranslator extends Service {
             NetworkTask networkTask =  new NetworkTask(this, sourceLanguageCode, targetLanguageCode, sourceText, GoogleCredentials.fromStream(this.getApplication().getResources().openRawResource(R.raw.credentials)));
             Translation result = networkTask.execute().get();
 
-            //TODO: start the activity through push notification
             Intent dialogIntent = new Intent(this, TranslationDialog.class).putExtra(TranslationDialog.TRANSLATION_KEY, result.getTranslatedText());
             dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(dialogIntent);

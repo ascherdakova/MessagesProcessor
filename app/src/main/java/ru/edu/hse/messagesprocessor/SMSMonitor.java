@@ -9,12 +9,11 @@ import android.content.SharedPreferences;
 import android.provider.Telephony;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsMessage;
-import android.widget.Toast;
 import java.util.Objects;
 
 public class SMSMonitor extends BroadcastReceiver {
 
-    public static final String NOTIFICATION_CHANNEL_ID="messages_processor_channel";
+    public static final String NOTIFICATION_CHANNEL_ID="message_processor_channel";
     public static final String KEY_SMS_BODY = "sms_body";
 
     @Override
@@ -24,7 +23,8 @@ public class SMSMonitor extends BroadcastReceiver {
                     new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                             .setSmallIcon(R.drawable.notification_icon)
                             .setContentTitle(context.getApplicationContext().getResources().getString(R.string.notification_title))
-                            .setContentText(context.getApplicationContext().getResources().getString(R.string.notification_text));
+                            .setContentText(context.getApplicationContext().getResources().getString(R.string.notification_text))
+                            .setAutoCancel(true);
 
             Intent notificationIntent = new Intent(context, SMSTranslator.class);
             PendingIntent pendingIntent = PendingIntent.getService(context, 0, notificationIntent, 0);
@@ -36,12 +36,14 @@ public class SMSMonitor extends BroadcastReceiver {
             SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.custom_shared_preferences), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(KEY_SMS_BODY, smsBody.toString());
-            editor.commit();
+            editor.apply();
 
             mBuilder.setContentIntent(pendingIntent);
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             final int notificationId = 1;
-            notificationManager.notify(notificationId, mBuilder.build());
+            if (notificationManager != null) {
+                notificationManager.notify(notificationId, mBuilder.build());
+            }
         }
     }
 }
