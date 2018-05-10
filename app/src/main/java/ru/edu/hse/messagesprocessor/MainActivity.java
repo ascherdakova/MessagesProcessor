@@ -47,8 +47,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             credentials = GoogleCredentials.fromStream(getResources().openRawResource(R.raw.credentials));
         } catch (IOException e) {
-            //TODO: correct processing
-            e.printStackTrace();
+            Toast.makeText(this, R.string.network_issue_message, Toast.LENGTH_LONG).show();
         }
 
         //show progress bar & turn off user interaction
